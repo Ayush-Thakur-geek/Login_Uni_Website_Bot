@@ -4,6 +4,7 @@ from time import sleep
 from PIL import Image
 import pytesseract
 import requests
+import os
 
 from essentials import uid, pwd
 
@@ -22,6 +23,8 @@ class CuimsBot():
         next_btn = self.driver.find_element(By.XPATH, '//*[@id="btnNext"]')
         next_btn.click()
 
+        sleep(2)
+
         password_input = self.driver.find_element(By.XPATH, '//*[@id="txtLoginPassword"]')
         password_input.send_keys(pwd)
     
@@ -34,6 +37,7 @@ class CuimsBot():
 
         captcha_input = self.driver.find_element(By.XPATH, '//*[@id="txtcaptcha"]')
         captcha_input.send_keys(captcha_text)
+        os.remove("captcha.png")
         login_btn = self.driver.find_element(By.XPATH, '//*[@id="btnLogin"]')
         login_btn.click()
 
