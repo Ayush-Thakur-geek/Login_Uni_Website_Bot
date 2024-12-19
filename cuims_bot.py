@@ -1,7 +1,11 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from time import sleep
-from secrets import uid, pwd
+from PIL import Image
+import pytesseract
+import requests
+
+from essentials import uid, pwd
 
 class CuimsBot():
     def __init__(self):
@@ -9,25 +13,30 @@ class CuimsBot():
 
     def login(self):
         self.driver.get('https://uims.cuchd.in/')
-        student_login = bot.driver.find_element(By.XPATH, '/html/body/section/div/div[2]/div/div[1]/div/a')
+        student_login = self.driver.find_element(By.XPATH, '/html/body/section/div/div[2]/div/div[1]/div/a')
         student_login.click()
-        # for handle in self.driver.window_handles:
-        #     self.driver.switch_to.window(handle)
-        #     print("Current URL:", self.driver.current_url)
-        bot.driver.switch_to.window(bot.driver.window_handles[1])
-        login_input = bot.driver.find_element(By.XPATH, '//*[@id="txtUserId"]')
-        login_input.send_keys(uid)
-        next_btn = bot.driver.find_element(By.XPATH, '//*[@id="btnNext"]')
-        next_btn.click()
-        for handle in self.driver.window_handles:
-            self.driver.switch_to.window(handle)
-            print("Current URL:", self.driver.current_url)
 
-        password_input = bot.driver.find_element(By.XPATH, '//*[@id="txtLoginPassword"]')
+        self.driver.switch_to.window(self.driver.window_handles[1])
+        login_input = self.driver.find_element(By.XPATH, '//*[@id="txtUserId"]')
+        login_input.send_keys(uid)
+        next_btn = self.driver.find_element(By.XPATH, '//*[@id="btnNext"]')
+        next_btn.click()
+
+        password_input = self.driver.find_element(By.XPATH, '//*[@id="txtLoginPassword"]')
         password_input.send_keys(pwd)
-        sleep(10)
-        login_btn = bot.driver.find_element(By.XPATH, '//*[@id="btnLogin"]')
+    
+        captcha = self.driver.find_element(By.XPATH, '//*[@id="imgCaptcha"]')
+        captcha.screenshot("captcha.png")
+
+        captcha_image = Image.open("captcha.png")
+        captcha_text = pytesseract.image_to_string(captcha_image)
+        print(captcha_text)
+
+        captcha_input = self.driver.find_element(By.XPATH, '//*[@id="txtcaptcha"]')
+        captcha_input.send_keys(captcha_text)
+        login_btn = self.driver.find_element(By.XPATH, '//*[@id="btnLogin"]')
         login_btn.click()
+
 
 bot = CuimsBot()
 bot.login()
